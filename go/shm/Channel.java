@@ -1,6 +1,7 @@
 package go.shm;
 
-import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.concurrent.Semaphore;
 
 import go.Direction;
@@ -9,54 +10,70 @@ import go.Observer;
 public class Channel<T> implements go.Channel<T> {
 
     // --- Attributes ---
-    String name;
-    final Semaphore inMutex;
-    final Semaphore outMutex;
-    final Semaphore globMutex;
-    T val;
+    private String name;
+    private Semaphore inSemaphore;
+    private Semaphore outSemaphore;
+    private Semaphore globalSemaphore;
+    List<Observer> observerOut;
+    List<Observer> observerIn;
+    T valeur;
 
 
     // --- Methods ---
     public Channel(String name) {
         this.name = name;
-        this.inMutex = new Semaphore(0); 
-        this.outMutex = new Semaphore(1);
-        this.globMutex = new Semaphore(1);
-        this.val = null;
+        this.inSemaphore = new Semaphore(0); 
+        this.outSemaphore = new Semaphore(1);
+        this.globalSemaphore = new Semaphore(1);
+        observerOut = new LinkedList();
+        observerIn = new LinkedList();
     }
     
     public void out(T v) {
         try {
-            globMutex.acquire();
-            outMutex.acquire();
+            synchronized (observerOut) {
+                if (!observerOut.isEmpty()){
+                    for(Observer observer : observerOut){
+                        observer.update();
+                    }
+                }
+            }
+            globalSemaphore.acquire();
+            outSemaphore.acquire();
 
             // SC
-            val = v;
+            valeur = v;
 
-
-            inMutex.release();
+            inSemaphore.release();
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
     
     public T in() {
+        T retour = null;
         try {
-            inMutex.acquire();
+            synchronized (observerIn) {
+                if (!observerIn.isEmpty()){
+                    for(Observer observer : observerIn){
+                        observer.update();
+                    }
+                    observerIn.clear();
+                }
+            }
+            inSemaphore.acquire();
             
             // SC
-            T retour = val;
+            retour = valeur;
             
-            outMutex.release();
-            inMutex.release();
-            globMutex.release();
-            return retour;
+            outSemaphore.release();
+            inSemaphore.release();
+            globalSemaphore.release();
 
         } catch (Exception e) {
             e.printStackTrace();
         }
-
-        return null;
+        return retour;
     }
 
     public String getName() {
@@ -64,7 +81,15 @@ public class Channel<T> implements go.Channel<T> {
     }
 
     public void observe(Direction dir, Observer observer) {
-        // TODO
+        switch (dir) {
+            case Out:
+                observerOut.add(observer);
+                break;
+        
+            case In:
+                observerIn.add(observer);
+                break;
+        }
     }
         
 }
