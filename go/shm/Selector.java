@@ -8,7 +8,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Set;
 import java.util.concurrent.Semaphore;
 
 public class Selector implements go.Selector {
@@ -37,7 +36,6 @@ public class Selector implements go.Selector {
         try {
             semaphore.acquire();
         } catch (InterruptedException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         }
         Channel retour = channelReady.get(0);
