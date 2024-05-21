@@ -38,6 +38,8 @@ public class Selector implements go.Selector {
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
+        
+        System.out.println("******");
         Channel retour = channelReady.get(0);
         Direction directionRetour = channels.get(retour);
         channelReady.remove(0);

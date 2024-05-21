@@ -36,15 +36,15 @@ public class Channel<T> implements go.Channel<T> {
 
     public void out(T v) {
         try {
-            synchronized (observers.get(Direction.Out)) {
+            synchronized (observers.get(Direction.In)) {
                 // SC
-                ArrayList<Observer> observersOut = observers.get(Direction.Out);
+                ArrayList<Observer> observersIn = observers.get(Direction.In);
 
-                if (!observersOut.isEmpty()){
-                    for(Observer observer : observersOut){
+                if (!observersIn.isEmpty()){
+                    for(Observer observer : observersIn){
                         observer.update();
                     }
-                    observersOut.clear();
+                    observersIn.clear();
                 }
                 // FIN SC
             }
@@ -66,16 +66,17 @@ public class Channel<T> implements go.Channel<T> {
 
     public T in() {
         T retour = null;
+        System.out.println("+++++++");
         try {
-            synchronized (observers.get(Direction.In)) {
+            synchronized (observers.get(Direction.Out)) {
                 // SC
-                ArrayList<Observer> observersIn = observers.get(Direction.In);
+                ArrayList<Observer> observersOut = observers.get(Direction.Out);
 
-                if (!observersIn.isEmpty()){
-                    for(Observer observer : observersIn){
+                if (!observersOut.isEmpty()){
+                    for(Observer observer : observersOut){
                         observer.update();
                     }
-                    observersIn.clear();
+                    observersOut.clear();
                 }
                 // FIN SC
             }

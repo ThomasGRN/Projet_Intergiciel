@@ -1,6 +1,5 @@
 package go.test;
 
-import go.Direction;
 import go.*;
 
 /* select in */
@@ -33,6 +32,7 @@ public class TestShm11 {
                 try { Thread.sleep(100);  } catch (InterruptedException e) { }
                 @SuppressWarnings("unchecked")
                 Channel<Integer> c = s.select();
+                System.out.println("----------");
                 int v = c.in();
                 if (v != 4) quit("KO");
 
