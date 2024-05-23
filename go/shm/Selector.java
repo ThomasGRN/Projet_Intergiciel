@@ -22,7 +22,10 @@ public class Selector implements go.Selector {
         this.semaphore = new Semaphore(0);
 
         for (Entry<Channel, Direction> entry : channels.entrySet()){
-            entry.getKey().observe(entry.getValue(), new Observer(){
+            Channel channel = entry.getKey();
+            Direction direction = entry.getValue();
+
+            channel.observe(direction, new Observer(){
                 @Override
                 public void update(){
                     channelReady.add(entry.getKey());
