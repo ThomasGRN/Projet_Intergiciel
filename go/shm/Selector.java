@@ -39,11 +39,12 @@ public class Selector implements go.Selector {
             e.printStackTrace();
         }
         
-        System.out.println("******");
         Channel retour = channelReady.get(0);
         Direction directionRetour = channels.get(retour);
+
         channelReady.remove(0);
-        retour.observe(Direction.inverse(directionRetour), new Observer(){
+
+        retour.observe(directionRetour, new Observer(){
             @Override
             public void update(){
                 channelReady.add(retour);

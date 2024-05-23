@@ -66,7 +66,6 @@ public class Channel<T> implements go.Channel<T> {
 
     public T in() {
         T retour = null;
-        System.out.println("+++++++");
         try {
             synchronized (observers.get(Direction.Out)) {
                 // SC

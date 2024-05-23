@@ -1,6 +1,5 @@
 package go.test;
 
-import go.Direction;
 import go.*;
 
 /* select mixte */
@@ -30,18 +29,20 @@ public class TestShm13 {
                 int v = c1.in();
                 if (v != 4) quit("KO");
                 try { Thread.sleep(100);  } catch (InterruptedException e) { }
+                
                 c3.out(8);
                 v = c2.in();
                 if (v != 6) quit("KO");
-        }).start();
-
-        new Thread(() -> {
+            }).start();
+            
+            new Thread(() -> {
                 try { Thread.sleep(100);  } catch (InterruptedException e) { }
                 @SuppressWarnings("unchecked")
                 Channel<Integer> c = s.select();
                 c.out(4);
                 @SuppressWarnings("unchecked")
                 Channel<Integer> cc = s.select();
+                System.out.println(cc.getName());
                 int v = cc.in();
                 if (v != 8) quit("KO");
                 @SuppressWarnings("unchecked")
@@ -49,7 +50,6 @@ public class TestShm13 {
                 ccc.out(6);
                 quit("ok");
         }).start();
-        
                    
     }
 }
