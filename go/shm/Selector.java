@@ -25,7 +25,7 @@ public class Selector implements go.Selector {
             Channel channel = entry.getKey();
             Direction direction = entry.getValue();
 
-            channel.observe(direction, new Observer(){
+            channel.observe(Direction.inverse(direction), new Observer(){
                 @Override
                 public void update(){
                     channelReady.add(entry.getKey());
@@ -41,19 +41,21 @@ public class Selector implements go.Selector {
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
+        Channel retour;
+        synchronized (channelReady){
+            retour = channelReady.get(0);
+            Direction directionRetour = channels.get(retour);
+
+            channelReady.remove(0);
         
-        Channel retour = channelReady.get(0);
-        Direction directionRetour = channels.get(retour);
-
-        channelReady.remove(0);
-
-        retour.observe(directionRetour, new Observer(){
-            @Override
-            public void update(){
-                channelReady.add(retour);
-                semaphore.release();
-            }
-        });
+            retour.observe(Direction.inverse(directionRetour), new Observer(){
+                @Override
+                public void update(){
+                    channelReady.add(retour);
+                    semaphore.release();
+                }
+            });
+        }
         return retour;
     }
 
