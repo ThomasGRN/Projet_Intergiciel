@@ -1,6 +1,7 @@
 package go.cs;
 
 import go.Direction;
+import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.util.Map;
@@ -30,16 +31,16 @@ public class Factory implements go.Factory {
         Channel<T> channel = null;
 
         try {
-            RemoteServer<T> server = (RemoteServer<T>)registry.lookup("server");
+            ChannelMap<T> channelMap = (ChannelMap<T>)registry.lookup("channelMap");
 
-            channel = server.getChannel(name);
+            channel = (Channel<T>)channelMap.getChannel(name);
 
-            if(channel == null){
-                channel = new Channel<>(name);
-
-                server.addChannel(channel);
-            } 
-
+        } catch (RemoteException remoteExc) {
+            System.out.println("Communication avec le registre impossible");
+            remoteExc.printStackTrace();
+        } catch (NullPointerException nullExc) {
+            System.out.println("channelMap null");
+            nullExc.printStackTrace();
         } catch (Exception e) {
             e.printStackTrace();
         }
