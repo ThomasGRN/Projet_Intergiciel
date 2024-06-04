@@ -11,7 +11,7 @@ import java.rmi.registry.Registry;
 public class ServerImpl {
     
     private static Registry registry;
-    private static ChannelMap<?> channelMap;
+    private static RemoteChannelMap<?> channelMap;
     
 
     public static void main(String args[]) {

@@ -31,9 +31,9 @@ public class Factory implements go.Factory {
         Channel<T> channel = null;
 
         try {
-            ChannelMap<T> channelMap = (ChannelMap<T>)registry.lookup("channelMap");
+            RemoteChannelMap<T> channelMap = (RemoteChannelMap<T>)registry.lookup("channelMap");
 
-            channel = (Channel<T>)channelMap.getChannel(name);
+            channel = channelMap.getChannel(name);
 
         } catch (RemoteException remoteExc) {
             System.out.println("Communication avec le registre impossible");
