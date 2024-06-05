@@ -1,11 +1,12 @@
 package go.cs;
 
+import java.io.Serializable;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.HashMap;
 import java.util.Map;
 
-public class ChannelMap <T> extends UnicastRemoteObject implements RemoteChannelMap<T> {
+public class ChannelMap <T extends Serializable> extends UnicastRemoteObject implements RemoteChannelMap<T> {
     
     // ATTRIBUTES
     private Map<String, Channel<T>> channelMap;
@@ -15,21 +16,22 @@ public class ChannelMap <T> extends UnicastRemoteObject implements RemoteChannel
     }
 
 
-    private Channel<T> addChannel(Channel<T> c) {
-        channelMap.put(c.getName(), c);
+    private Channel<T> addChannel(String name) throws RemoteException {
+        Channel<T> c = new Channel<>(name);
+        channelMap.put(name, c);
+   
         return c;
     }
 
     
     @Override
     public Channel<T> getChannel(String name) throws RemoteException {
+        System.out.println("+++++++++ getChannel appelé pour : " + name);
         Channel<T> c = channelMap.get(name);
-
         if(c == null) {
-            c = new Channel<>(name);
-            addChannel(c);
+            c = addChannel(name);
         }
-
+        System.out.println("--------------" + c.getClass());
         return c;
     }
 }

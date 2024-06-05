@@ -2,19 +2,23 @@ package go.cs;
 
 import go.Direction;
 import go.Observer;
+import java.io.Serializable;
 import java.rmi.RemoteException;
-import java.rmi.server.UnicastRemoteObject;
+import java.util.concurrent.Semaphore;
 
-public class Channel<T> extends UnicastRemoteObject implements go.Channel<T> {
+public class Channel<T extends Serializable> implements go.Channel<T> {
 
-    private RemoteChannelImpl<T> channel; 
+     // --- Attributes ---
+    private final String name;
+    private final Semaphore inSemaphore;
+    private final Semaphore outSemaphore;
+    private T value;
+    private final Object lock = new Object();
 
     public Channel(String name) throws RemoteException {
-        try {
-            channel = new RemoteChannelImpl<>(name);
-        } catch (RemoteException e) {
-            e.printStackTrace();
-        }
+        this.name = name;
+        inSemaphore = new Semaphore(0);
+        outSemaphore = new Semaphore(0);
     }
 
 
@@ -22,8 +26,15 @@ public class Channel<T> extends UnicastRemoteObject implements go.Channel<T> {
     @Override
     public void out(T v) {
         try {
-            channel.out(v);
-        } catch (RemoteException e) {
+            outSemaphore.acquire(); // Wait for the consumer to be ready
+    
+            synchronized (lock) {
+                value = v;
+                inSemaphore.release(); // Signal that a value is available
+                lock.notifyAll(); // Notify any waiting in() methods
+            }
+            
+        } catch (InterruptedException e) {
             e.printStackTrace();
         }
     }
@@ -32,29 +43,29 @@ public class Channel<T> extends UnicastRemoteObject implements go.Channel<T> {
 
     @Override
     public T in() {
-       T result = null;
+        T retour = null;
 
         try{
-            result = channel.in();
-        } catch (RemoteException e){
+            outSemaphore.release(); // Signal that the value has been consumed
+                
+            inSemaphore.acquire(); // Wait for a value to be available
+
+            synchronized (lock) {
+                retour = value;
+                value = null;
+                lock.notifyAll(); // Notify any waiting out() methods
+            }
+        } catch (InterruptedException e){
             e.printStackTrace();
         }
 
-        return result;
+        return retour;
     }
 
 
 
     @Override
     public String getName() {
-        String name = null;
-
-        try {
-            name = channel.getName();
-        } catch (RemoteException e) {
-            e.printStackTrace();
-        }
-
         return name;
     }
 

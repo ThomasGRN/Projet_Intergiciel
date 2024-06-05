@@ -1,6 +1,9 @@
 package go.cs;
 
 import go.Direction;
+
+import java.io.Serializable;
+import java.rmi.Naming;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
@@ -26,14 +29,17 @@ public class Factory implements go.Factory {
      * les appels suivants avec le même nom donneront accès au même canal.
      */
     @Override
-    public <T> go.Channel<T> newChannel(String name) {
+    public <T extends Serializable> go.Channel<T> newChannel(String name) {
 
         Channel<T> channel = null;
 
         try {
-            RemoteChannelMap<T> channelMap = (RemoteChannelMap<T>)registry.lookup("channelMap");
-
-            channel = channelMap.getChannel(name);
+            RemoteChannelMap<T> channelMap = (RemoteChannelMap<T>) Naming.lookup("rmi://localhost:1099/channelMap");
+            
+            if(channelMap != null){
+                System.out.println("*********** " + channelMap.getClass().getName());
+                channel = channelMap.getChannel(name);
+            }
 
         } catch (RemoteException remoteExc) {
             System.out.println("Communication avec le registre impossible");
@@ -41,6 +47,9 @@ public class Factory implements go.Factory {
         } catch (NullPointerException nullExc) {
             System.out.println("channelMap null");
             nullExc.printStackTrace();
+        } catch (ClassCastException classCastExc) {
+            System.out.println("Erreur de conversion de classe");
+            classCastExc.printStackTrace();
         } catch (Exception e) {
             e.printStackTrace();
         }

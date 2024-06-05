@@ -1,8 +1,8 @@
 package go.cs;
 
+import java.rmi.Naming;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
-import java.rmi.registry.Registry;
 
 /**
  * Implantation d'un serveur hébergeant des canaux.
@@ -10,16 +10,15 @@ import java.rmi.registry.Registry;
  */
 public class ServerImpl {
     
-    private static Registry registry;
     private static RemoteChannelMap<?> channelMap;
     
 
     public static void main(String args[]) {
         try {
-            registry = LocateRegistry.createRegistry(1099);
+            LocateRegistry.createRegistry(1099);
             channelMap = new ChannelMap<>();
 
-            registry.rebind("channelMap", channelMap);
+            Naming.rebind("rmi://localhost:1099/channelMap", channelMap);
 
             System.out.println("Serveur READY");
 
