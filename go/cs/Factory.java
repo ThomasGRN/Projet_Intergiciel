@@ -29,7 +29,7 @@ public class Factory implements go.Factory {
      * les appels suivants avec le même nom donneront accès au même canal.
      */
     @Override
-    public <T extends Serializable> go.Channel<T> newChannel(String name) {
+    public <T> go.Channel<T> newChannel(String name) {
 
         Channel<T> channel = null;
 

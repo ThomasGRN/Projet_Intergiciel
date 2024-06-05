@@ -2,11 +2,10 @@ package go.cs;
 
 import go.Direction;
 import go.Observer;
-import java.io.Serializable;
 import java.rmi.RemoteException;
 import java.util.concurrent.Semaphore;
 
-public class Channel<T extends Serializable> implements go.Channel<T> {
+public class Channel<T> implements go.Channel<T> {
 
      // --- Attributes ---
     private final String name;

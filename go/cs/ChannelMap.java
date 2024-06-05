@@ -1,12 +1,11 @@
 package go.cs;
 
-import java.io.Serializable;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.HashMap;
 import java.util.Map;
 
-public class ChannelMap <T extends Serializable> extends UnicastRemoteObject implements RemoteChannelMap<T> {
+public class ChannelMap <T> extends UnicastRemoteObject implements RemoteChannelMap<T> {
     
     // ATTRIBUTES
     private Map<String, Channel<T>> channelMap;
